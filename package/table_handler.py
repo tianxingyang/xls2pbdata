@@ -99,7 +99,7 @@ class TableHandler:
 
     def dump(self, dest, dest_log):
         for sheet in self._sheets:
-            if self.get_message_name(sheet) == None:
+            if self.get_message_name(sheet) is None:
                 continue
             data = self._pb_obj_dic[self.get_message_name(
                 sheet)].SerializeToString()
@@ -121,7 +121,7 @@ class TableHandler:
     def _parse_sheets(self):
         # traverse each row
         for sheet in self._sheets:
-            if self.get_message_name(sheet) == None:
+            if self.get_message_name(sheet) is None:
                 continue
 
             print('    converting begin : ' + str(sheet.name))

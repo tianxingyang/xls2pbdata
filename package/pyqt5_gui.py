@@ -2,7 +2,7 @@ import datetime
 import time
 
 import xlrd
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import QCoreApplication, Qt
 from PyQt5.QtWidgets import (QApplication, QButtonGroup, QCheckBox,
                              QDesktopWidget, QDialog, QDialogButtonBox,
                              QFileDialog, QHBoxLayout, QLabel, QLineEdit,
@@ -11,6 +11,25 @@ from PyQt5.QtWidgets import (QApplication, QButtonGroup, QCheckBox,
                              QVBoxLayout, QWidget)
 
 from .table_handler import TableHandler
+
+
+class MyPushButton(QPushButton):
+    def __init__(self, name, screen):
+        super(MyPushButton, self).__init__(name)
+        super().setFixedSize(screen.width() / 16, screen.height() / 43.2)
+
+
+class MyLabel(QLabel):
+    def __init__(self, name, screen):
+        super(MyLabel, self).__init__(name)
+        super().setFixedSize(screen.width() / 16, screen.height() / 43.2)
+        super().setAlignment(Qt.AlignCenter)
+
+
+class MyLineEdit(QLineEdit):
+    def __init__(self, screen):
+        super().__init__()
+        super().setFixedHeight(screen.height() / 43.2)
 
 
 class Xls2PBDataGui(QMainWindow):
@@ -35,49 +54,46 @@ class Xls2PBDataGui(QMainWindow):
         self.setWindowTitle('Xls To Bin - vito')
 
         self.statusBar().showMessage('Wait selecting files')
+        screen = QDesktopWidget().screenGeometry()
 
-        self._select_pb_file_button = QPushButton('select pb file')
-        self._select_pb_file_button.setFixedSize(120, 25)
-        self._select_xls_file_button = QPushButton('select xls file')
-        self._select_xls_file_button.setFixedSize(120, 25)
-        self._select_sheet_button = QPushButton('select sheet')
-        self._select_sheet_button.setFixedSize(120, 25)
-        self._convert_button = QPushButton("Convert xls to bin")
-        self._convert_button.setFixedSize(120, 25)
+        self._select_pb_file_button = MyPushButton('select pb file', screen)
+        self._select_xls_file_button = MyPushButton('select xls file', screen)
+        self._select_sheet_button = MyPushButton('select sheet', screen)
+        self._convert_button = MyPushButton("Convert xls to bin", screen)
 
-        self._pb_file_label = QLabel('protobuf file')
-        self._pb_file_label.setFixedSize(80, 25)
-        self._pb_file_label.setAlignment(Qt.AlignCenter)
-        self._xls_file_label = QLabel('xls file')
-        self._xls_file_label.setFixedSize(80, 25)
-        self._xls_file_label.setAlignment(Qt.AlignCenter)
-        self._xls_sheet_label = QLabel('xls sheet')
-        self._xls_sheet_label.setFixedSize(80, 25)
-        self._xls_sheet_label.setAlignment(Qt.AlignCenter)
+        self._pb_file_label = MyLabel('protobuf file', screen)
+        self._xls_file_label = MyLabel('xls file', screen)
+        self._xls_sheet_label = MyLabel('xls sheet', screen)
 
-        self._pb_file_text = QLineEdit(self)
-        self._xls_file_text = QLineEdit(self)
-        self._xls_sheet_text = QLineEdit(self)
+        self._pb_file_text = MyLineEdit(screen)
+        self._xls_file_text = MyLineEdit(screen)
+        self._xls_sheet_text = MyLineEdit(screen)
 
         self._public_rb = QRadioButton(self)
         self._server_rb = QRadioButton(self)
         self._client_rb = QRadioButton(self)
+        self._all_rb = QRadioButton(self)
 
         self._public_rb.setText('public')
         self._server_rb.setText('server')
         self._client_rb.setText('client')
+        self._all_rb.setText('All')
 
         self._range_button_box = QButtonGroup()
         self._range_button_box.addButton(self._public_rb, 1)
         self._range_button_box.addButton(self._server_rb, 2)
         self._range_button_box.addButton(self._client_rb, 3)
+        self._range_button_box.addButton(self._all_rb, 4)
 
+        select_range_box_layout.addStretch(1)
         select_range_box_layout.addWidget(self._public_rb)
         select_range_box_layout.addStretch(1)
         select_range_box_layout.addWidget(self._server_rb)
         select_range_box_layout.addStretch(1)
         select_range_box_layout.addWidget(self._client_rb)
-        select_range_box_layout.addStretch(8)
+        select_range_box_layout.addStretch(1)
+        select_range_box_layout.addWidget(self._all_rb)
+        select_range_box_layout.addStretch(1)
 
         main_layout.addLayout(select_range_box_layout)
 
@@ -112,9 +128,8 @@ class Xls2PBDataGui(QMainWindow):
         self._convert_button.clicked.connect(self.convert)
         self._select_sheet_button.clicked.connect(self.select_xls_sheet)
 
-        screen = QDesktopWidget().screenGeometry()
-        self.setFixedSize(640, 360)
-        self._main_widget.setFixedSize(640, 360)
+        self.setFixedSize(screen.width() / 3, screen.height() / 3)
+        self._main_widget.setFixedSize(screen.width() / 3, screen.height() / 3)
         size = self.geometry()
         self.move((screen.width() - size.width()) / 3,
                   (screen.height() - size.height()) / 3)
@@ -166,7 +181,6 @@ class Xls2PBDataGui(QMainWindow):
     def selected_sheets_name(self):
         return self._selected_sheets_name
 
-    # TODO convert bytes to the path same as xls path in ResData
     def _convert_xls_2_bin(self):
         file_type = ""
         check_id = self._range_button_box.checkedId()
@@ -179,8 +193,8 @@ class Xls2PBDataGui(QMainWindow):
 
         try:
             handler = TableHandler(self._xls_file_text.text(),
-                                      self._selected_sheets_name,
-                                      self._pb_file_text.text(), file_type)
+                                   self._selected_sheets_name,
+                                   self._pb_file_text.text(), file_type)
         except BaseException as err:
             print(err)
             self.pop_err_box(err.__str__())
