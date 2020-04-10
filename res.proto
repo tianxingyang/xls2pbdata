@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+// 配置还是要自己管理，因为有些接口使用 proto3 的 map 无法完成。
+
+package RES;
+
+message Ability
+{
+    message M
+    {
+        int32 id = 1;
+        int32 script_id = 2;
+        string name = 3; // 技能名字
+        string attack = 4; // 普攻名字
+        string active_skill = 5; // 主动技能名字
+        string passive_skill = 6; // 被动技能名字
+    }
+
+    repeated M ability_list = 1;
+}
+
+message BattleAction
+{
+    message M
+    {
+        int32 id = 1;
+        string desc = 2;
+        repeated int32 para = 3;
+    }
+
+    repeated M battle_action_list = 1;
+}
