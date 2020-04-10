@@ -1,28 +1,24 @@
 # -*- coding:utf-8 -*-
 
+import importlib
+import json
 import os
 import sys
-import json
-from json.decoder import JSONDecodeError
 import time
-import importlib
 from datetime import datetime
-import xlrd
-from PyQt5.QtWidgets import QApplication, QSizePolicy, QMessageBox, \
-    QSpacerItem, QDialogButtonBox, QMainWindow, QPushButton, QLabel, \
-    QCheckBox, QLineEdit, QDialog, QWidget, QVBoxLayout, QDesktopWidget, \
-    QFileDialog, QHBoxLayout, QRadioButton, QButtonGroup
-from PyQt5.QtCore import Qt
-from google.protobuf.internal import api_implementation
+from json.decoder import JSONDecodeError
 
-if api_implementation.Type() == 'cpp':
-    from google.protobuf.pyext._message import \
-        RepeatedScalarContainer as RepeatedScalarFieldContainer
-    from google.protobuf.pyext._message import \
-        RepeatedCompositeContainer as RepeatedCompositeFieldContainer
-else:
-    from google.protobuf.internal.containers import \
-        RepeatedCompositeFieldContainer, RepeatedScalarFieldContainer
+import xlrd
+from google.protobuf.internal import api_implementation
+from google.protobuf.internal.containers import (
+    RepeatedCompositeFieldContainer, RepeatedScalarFieldContainer)
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import (QApplication, QButtonGroup, QCheckBox,
+                             QDesktopWidget, QDialog, QDialogButtonBox,
+                             QFileDialog, QHBoxLayout, QLabel, QLineEdit,
+                             QMainWindow, QMessageBox, QPushButton,
+                             QRadioButton, QSizePolicy, QSpacerItem,
+                             QVBoxLayout, QWidget)
 
 
 class GlobalVariables:
@@ -139,7 +135,8 @@ class Xls2DataHandler:
             dest_file.write(data)
             dest_file.close()
             data = self._pb_obj_dic[self.get_message_name(sheet)]
-            log_file = open(dest_log + self.get_message_name(sheet) + '.log', 'w+')
+            log_file = open(
+                dest_log + self.get_message_name(sheet) + '.log', 'w+')
             # print(dest + self.get_message_name(sheet))
             # print("log write")
             log_file.write(str(data))
@@ -157,10 +154,11 @@ class Xls2DataHandler:
             print('    converting begin : ' + str(sheet.name))
             for current_row_num in range(1, sheet.nrows):
                 # add new obj to list
-                pb_obj = self._pb_obj_dic[self.get_message_name(sheet)].items_list.add()
+                pb_obj = self._pb_obj_dic[self.get_message_name(
+                    sheet)].items_list.add()
                 if self._parse_row(current_row_num, pb_obj, sheet):
                     del self._pb_obj_dic[self.get_message_name(sheet)].items_list[
-                            len(self._pb_obj_dic[self.get_message_name(sheet)].items_list) - 1]
+                        len(self._pb_obj_dic[self.get_message_name(sheet)].items_list) - 1]
 
             print('    converting end : ' + str(sheet.name))
         # print(self._pb_obj_dic)
@@ -203,37 +201,41 @@ class Xls2DataHandler:
                                     is_null = False
                                 except TypeError:
                                     # 尝试转数值
-                                    if cell_value == u"" :
+                                    if cell_value == u"":
                                         # 数值 - 空表格
                                         pass
-                                    else :
+                                    else:
                                         try:
                                             member.append(int(cell_value))
                                             is_null = False
                                         except TypeError:
-                                            print ("[Repeated] UnKnown Exception row[%d], col[%d] : %s %s" % (row_index + 1, current_col_num + 1, str(current_cell), str(cell_value)))
+                                            print("[Repeated] UnKnown Exception row[%d], col[%d] : %s %s" % (
+                                                row_index + 1, current_col_num + 1, str(current_cell), str(cell_value)))
                                             raise
-                        elif isinstance(member, str) :
+                        elif isinstance(member, str):
                             pb_obj.__setattr__(member_name, str(cell_value))
                             is_null = False
                         elif isinstance(member, int):
-                            if cell_value == u"" :
+                            if cell_value == u"":
                                 # 数值 - 空表格
                                 # print ("empty_cell row[%d], col[%d] : %s " % (row_index + 1, current_col_num + 1, str(current_cell)))
                                 pass
-                            else : 
-                                try :
-                                    pb_obj.__setattr__(member_name, int(cell_value))
+                            else:
+                                try:
+                                    pb_obj.__setattr__(
+                                        member_name, int(cell_value))
                                     is_null = False
                                 except BaseException:
-                                    print ("Int Exception row[%d], col[%d] : %s  %s" % (row_index + 1, current_col_num + 1, str(current_cell), str(cell_value)))
+                                    print("Int Exception row[%d], col[%d] : %s  %s" % (
+                                        row_index + 1, current_col_num + 1, str(current_cell), str(cell_value)))
                                     raise
                         else:
                             try:
                                 pb_obj.__setattr__(member_name, cell_value)
                                 is_null = False
                             except TypeError:
-                                print ("Other Exception row[%d], col[%d] : %s  %s" % (row_index + 1, current_col_num + 1, str(current_cell), str(cell_value)))
+                                print("Other Exception row[%d], col[%d] : %s  %s" % (
+                                    row_index + 1, current_col_num + 1, str(current_cell), str(cell_value)))
                                 raise
         return is_null
 
