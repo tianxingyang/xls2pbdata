@@ -4,8 +4,7 @@ import os
 
 import xlrd
 
-import consts
-import logging_wrapper
+from . import consts, logging_wrapper
 
 
 class TableHandler:
