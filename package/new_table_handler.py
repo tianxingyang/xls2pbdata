@@ -167,11 +167,11 @@ class NewTableHandler:
             if self._server_pb_obj:
                 server_data = self._server_pb_obj.SerializeToString()
                 with open(SERVER_DATA_PATH + sheet.name + ".bytes", "wb+") as f:
-                    f.write(client_data)
+                    f.write(server_data)
             if self._public_pb_obj:
                 public_data = self._public_pb_obj.SerializeToString()
                 with open(PUBLIC_DATA_PATH + sheet.name + ".bytes", "wb+") as f:
-                    f.write(client_data)
+                    f.write(public_data)
 
     @staticmethod
     def _get_cell_value(cell):
