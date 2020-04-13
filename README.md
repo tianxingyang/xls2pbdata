@@ -59,8 +59,6 @@ message Foo
 
 4. 执行main.py
 
-![Annotation 2020-04-13 231624.png](https://i.loli.net/2020/04/13/uIcrEt2Sf5yFUZP.png)
-
 （默认转所有配置，包括 public/client/server）
 
 5. 点击 select 选择excel文件
