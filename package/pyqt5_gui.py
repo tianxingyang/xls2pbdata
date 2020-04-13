@@ -1,5 +1,6 @@
 import datetime
 import time
+import traceback
 
 import xlrd
 from PyQt5.QtCore import QCoreApplication, Qt
@@ -10,7 +11,7 @@ from PyQt5.QtWidgets import (QApplication, QButtonGroup, QCheckBox,
                              QRadioButton, QSizePolicy, QSpacerItem,
                              QVBoxLayout, QWidget)
 
-from package import consts, table_handler
+from package import consts, new_table_handler
 
 
 class MyPushButton(QPushButton):
@@ -45,7 +46,6 @@ class Xls2PBDataGui(QMainWindow):
         self._main_widget = QWidget()
 
         self._has_xls_file = False
-        self._selected_sheets_name = []
 
         self.setWindowTitle('Xls To Bin - vito')
 
@@ -56,9 +56,7 @@ class Xls2PBDataGui(QMainWindow):
 
         self._xls_file_label = MyLabel('xls file', screen)
 
-        self._pb_file_text = MyLineEdit(screen)
         self._xls_file_text = MyLineEdit(screen)
-        self._xls_sheet_text = MyLineEdit(screen)
 
         self._public_rb = QRadioButton(self)
         self._server_rb = QRadioButton(self)
@@ -136,9 +134,6 @@ class Xls2PBDataGui(QMainWindow):
         msg_box.setText(err_msg)
         msg_box.exec_()
 
-    def selected_sheets_name(self):
-        return self._selected_sheets_name
-
     def _convert_xls_2_bin(self):
         file_type = ""
         check_id = self._range_button_box.checkedId()
@@ -152,35 +147,22 @@ class Xls2PBDataGui(QMainWindow):
             file_type = "all"
 
         try:
-            handler = table_handler.TableHandler(self._xls_file_text.text(),
-                                                 self._selected_sheets_name,
-                                                 self._pb_file_text.text(), file_type)
+            handler = new_table_handler.NewTableHandler(
+                self._xls_file_text.text(), file_type)
         except BaseException as err:
-            self.pop_err_box(err.__str__())
+            self.pop_err_box(traceback.format_exc())
             return
 
         try:
             handler.generate_data_file()
         except BaseException as err:
-            self.pop_err_box(err.__str__())
+            self.pop_err_box(traceback.format_exc())
             return
 
-        dest = '.\\gamedata\\'
-        dest_log = dest
-        if check_id == 1:
-            dest_log = dest + 'public\\'
-            dest = dest + 'public\\'
-        elif check_id == 2:
-            dest_log = dest + 'server\\'
-            dest = dest + 'server\\'
-        elif check_id == 3:
-            dest_log = dest + 'client_log\\'
-            dest = dest + 'client\\'
-
         try:
-            handler.dump(dest, dest_log)
+            handler.dump()
         except BaseException as err:
-            self.pop_err_box(err.__str__())
+            self.pop_err_box(traceback.format_exc())
             return
 
         msg_box = QMessageBox()
